@@ -1,0 +1,20 @@
+//
+// Special command line tool for Ryochan7/DS4Windows app to query the status of the app and profile via WinOS command line.
+//
+// DS4WindowsCmd app does nothing without the DS4Windows host app (DS4Windows host app https://github.com/Ryochan7/DS4Windows).
+//
+// This cmdline console tool just sends commands to the background host app. The host app itself supports the same command options,
+// but especially the use of "-command Query.Device#.PropertyName" command is a bit difficult to use in batch scripts with the host app.
+// The host app is WPF GUI app, so Windows batch script would not wait for a result and console output is not shown by default.
+// This DS4WindowsCmd app solves this problem by sending the command to the host app as a "real" Windows console app. Console apps
+// are easier to integrated with Windows batch scripts.
+//
+// License of this DS4WindowsCmd command line tool: "Do What the f**k You Want To" license. (http://www.wtfpl.net/) 
+//   USE AT YOUR OWN RISK.
+//   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+//   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+//   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+//   IN THE SOFTWARE.
+//
+// Copyright (c) 2020, MIKA-N. The app is provided free of charge. 
+//
