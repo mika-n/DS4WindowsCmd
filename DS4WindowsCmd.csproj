@@ -48,6 +48,7 @@
     <Content Include="License_DS4WindowsCmd.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ExampleScript.bat" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
