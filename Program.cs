@@ -136,6 +136,11 @@ namespace DS4WindowsCmd
                 Console.WriteLine("This DS4WindowsCmd.exe app was created just to send commands to the background host app and make it easier");
                 Console.WriteLine("to integrate with batch scripts.");
                 Console.WriteLine("");
+                Console.WriteLine("RETURN VALUE: Commands return results in errorlevel variable and as a console text output.");
+                Console.WriteLine("RETURN VALUE: If the text output is True or False boolean string then errorlevel is also set to 1 or 0.");
+                Console.WriteLine("RETURN VALUE: Query.Battery option outputs the battery level as text and sets errorlevel to 0-100.");
+                Console.WriteLine("RETURN VALUE: If there was an error then output is empty and errorlevel is set to 1000.");
+                Console.WriteLine("");
                 Console.WriteLine("USAGE: ");
                 Console.WriteLine("DS4WindowsCmd.exe -command Start | Stop | Shutdown  (start/stop controllers or shutdown the background app)");
                 Console.WriteLine("");
@@ -238,8 +243,15 @@ namespace DS4WindowsCmd
             }
 
             if (bDoSendMsg == false)
-                Environment.ExitCode = 100; // Something went wrong with Query.xxx cmd. The cmd was not sent, so return error status 100
-            else if (strResult.ToLower() == "true") 
+                Environment.ExitCode = 1000; // Something went wrong with Query.xxx cmd. The cmd was not sent, so return error status 1000
+            else if (args[1].ToLower().StartsWith("query.") && args[1].ToLower().EndsWith(".battery"))
+            {
+                int iBatteryLevel = 1000;
+                if(!int.TryParse(strResult, out iBatteryLevel))
+                    iBatteryLevel = 1000;
+                Environment.ExitCode = iBatteryLevel;
+            }
+            else if (strResult.ToLower() == "true")
                 Environment.ExitCode = 1;
             else
                 Environment.ExitCode = 0;
