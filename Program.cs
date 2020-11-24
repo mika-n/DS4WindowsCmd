@@ -121,11 +121,41 @@ namespace DS4WindowsCmd
         static void Main(string[] args)
         {
             string strResult = String.Empty;
-            bool bWaitResultData = false;
-            bool bDoSendMsg = true;
-
+            bool   bWaitResultData = false;
+            bool   bDoSendMsg = true;
             IntPtr hWndDS4WindowsForm = IntPtr.Zero;
-            hWndDS4WindowsForm = FindWindow(ReadIPCClassNameMMF(), "DS4Windows");
+
+            if (args.Length < 2 || (args[0].ToLower() != "-command" && args[0].ToLower() != "command"))
+            {
+                bDoSendMsg = false;
+                Console.WriteLine("");
+                Console.WriteLine("DS4WindowsCmd.exe app is a command line interface to Ryochan7/DS4Windows host app.");
+                Console.WriteLine("This command line tool does nothing without the host DS4Windows application running in background.");
+                Console.WriteLine("The host DS4Windows.exe app supports the same command line options, but because it is Windows GUI application");
+                Console.WriteLine("it has few limitations when integrated with Windows batch scripts (especially with the Query command).");
+                Console.WriteLine("This DS4WindowsCmd.exe app was created just to send commands to the background host app and make it easier");
+                Console.WriteLine("to integrate with batch scripts.");
+                Console.WriteLine("");
+                Console.WriteLine("USAGE: ");
+                Console.WriteLine("DS4WindowsCmd.exe -command Start | Stop | Shutdown  (start/stop controllers or shutdown the background app)");
+                Console.WriteLine("");
+                Console.WriteLine("DS4WindowsCmd.exe -command LoadProfile.device#.ProfileName  (load and set a new default profile)");
+                Console.WriteLine("DS4WindowsCmd.exe -command LoadTempProfile.device#.ProfileName  (load a temporary runtime profile)");
+                Console.WriteLine("   device#=1..8 as controller slot index");
+                Console.WriteLine("   ProfileName=Name of the existing DS4Windows profile");
+                Console.WriteLine("   Example: -command LoadProfile.1.SnakeGame");
+                Console.WriteLine("");
+                Console.WriteLine("DS4WindowsCmd.exe -command Query.device#.PropertyName  (query the value of a property)");
+                Console.WriteLine("   device#=1..8 as controller slot index");
+                Console.WriteLine("   PropertyName=ProfileName | OutContType | ActiveOutDevType | UseDInputOnly | DeviceVIDPID | DevicePath | MacAddress | DisplayName | ConnType | ExclusiveStatus | Battery | Charging | AppRunning");
+                Console.WriteLine("   Example: -command Query.1.Battery");
+                Console.WriteLine("   Example: -command Query.1.ProfileName");
+                Console.WriteLine("");
+                Console.WriteLine("ERROR. Invalid cmd line. See https://github.com/Ryochan7/DS4Windows/wiki/Command-line-options for more info.");
+
+            }
+            else
+                hWndDS4WindowsForm = FindWindow(ReadIPCClassNameMMF(), "DS4Windows");
 
             if (hWndDS4WindowsForm != IntPtr.Zero)
             {
@@ -138,26 +168,6 @@ namespace DS4WindowsCmd
 
                 try
                 {
-                    if (args.Length < 2 || (args[0].ToLower() != "-command" && args[0].ToLower() != "command"))
-                    {
-                        bDoSendMsg = false;
-                        Console.WriteLine("ERROR. Invalid or missing command line option. See https://github.com/Ryochan7/DS4Windows/wiki/Command-line-options for more info.");
-                        Console.WriteLine("DS4WindowsCmd.exe app is a command line interface to Ryochan7/DS4Windows host app. This command line tool does nothing without the host Ryochan7/DS4Windows host application.");
-                        Console.WriteLine("The host app DS4Windows.exe supports the same command line options, but because it is Windows GUI application it has few limitations when integrated with Windows batch scripts (especially with the Query command).");
-                        Console.WriteLine("This DS4WindowsCmd.exe app was created just to send these commands to the background host app and make it easier to integrate with batch scrits.");
-                        Console.WriteLine("");
-                        Console.WriteLine("USAGE. DS4WindowsCmd.exe -command Start | Stop | Shutdown  (start/stop controllers or shutdown the background app)");
-                        Console.WriteLine("");
-                        Console.WriteLine("USAGE. DS4WindowsCmd.exe -command LoadProfile.device#.ProfileName  (load and set a new default profile. The same as choosing a profile in Controllers tab page in DS4Windows GUI)");
-                        Console.WriteLine("USAGE. DS4WindowsCmd.exe -command LoadTempProfile.device#.ProfileName  (load a temporary runtime profile, the default profile option is not changed)");
-                        Console.WriteLine("USAGE.   device#=1..4 as controller slot index");
-                        Console.WriteLine("USAGE.   ProfileName=Name of the existing DS4Windows profile");
-                        Console.WriteLine("");
-                        Console.WriteLine("USAGE. DS4WindowsCmd.exe -command Query.device#.PropertyName  (query the current value of DS4Windows profile or application property)"); 
-                        Console.WriteLine("USAGE.   device#=1..4 as controller slot index");
-                        Console.WriteLine("USAGE.   PropertyName=ProfileName | OutContType | ActiveOutDevType | UseDInputOnly | DeviceVIDPID | DevicePath | MacAddress | DisplayName | ConnType | ExclusiveStatus | AppRunning");
-                    }
-
                     if (bDoSendMsg && args[1].ToLower().StartsWith("query."))
                     {
                         // Query.device# (1..4) command returns a string result via memory mapped file. The cmd is sent to the background DS4Windows 
@@ -213,14 +223,21 @@ namespace DS4WindowsCmd
                 }
             }
 
+            if (!bWaitResultData && args[1].ToLower().StartsWith("query.") && args[1].ToLower().EndsWith(".apprunning"))
+                bWaitResultData = true;
+
             // The cmd was "Query.xx". Let's dump the result string to console
             if (bWaitResultData)
             {
                 strResult = strResult.Trim();
+
+                if (String.IsNullOrEmpty(strResult) && args[1].ToLower().StartsWith("query.") && args[1].ToLower().EndsWith(".apprunning"))
+                    strResult = "False";
+
                 Console.WriteLine(strResult);
             }
 
-            if(bDoSendMsg == false)
+            if (bDoSendMsg == false)
                 Environment.ExitCode = 100; // Something went wrong with Query.xxx cmd. The cmd was not sent, so return error status 100
             else if (strResult.ToLower() == "true") 
                 Environment.ExitCode = 1;
