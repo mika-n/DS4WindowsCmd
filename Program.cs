@@ -152,9 +152,14 @@ namespace DS4WindowsCmd
                 Console.WriteLine("");
                 Console.WriteLine("DS4WindowsCmd.exe -command Query.device#.PropertyName  (query the value of a property)");
                 Console.WriteLine("   device#=1..8 as controller slot index");
-                Console.WriteLine("   PropertyName=ProfileName | OutContType | ActiveOutDevType | UseDInputOnly | DeviceVIDPID | DevicePath | MacAddress | DisplayName | ConnType | ExclusiveStatus | Battery | Charging | AppRunning");
+                Console.WriteLine("   PropertyName=ProfileName | OutContType | ActiveOutDevType | UseDInputOnly | DeviceVIDPID | DevicePath | MacAddress | DisplayName | ConnType | ExclusiveStatus | Battery | Charging | AppRunning | OutputSlotType | OutputSlotPermanentType | OutputSlotAttachedStatus | OutputSlotInputBound");
                 Console.WriteLine("   Example: -command Query.1.Battery");
                 Console.WriteLine("   Example: -command Query.1.ProfileName");
+                Console.WriteLine("   Example: -command Query.1.OutputSlotAttachedStatus");
+                Console.WriteLine("");
+                Console.WriteLine("DS4WindowsCmd.exe -command OutputSlot.slot#.Unplug   (unplug output device if it has the permanent type and a physical controller is not connected at the moment)");
+                Console.WriteLine("DS4WindowsCmd.exe -command OutputSlot.slot#.PlugDS4  (plug output device with DS4 type)");
+                Console.WriteLine("DS4WindowsCmd.exe -command OutputSlot.slot#.PlugX360 (plug output device with X360 type)");
                 Console.WriteLine("");
                 Console.WriteLine("ERROR. Invalid cmd line. See https://github.com/Ryochan7/DS4Windows/wiki/Command-line-options for more info.");
 
@@ -228,7 +233,7 @@ namespace DS4WindowsCmd
                 }
             }
 
-            if (!bWaitResultData && args[1].ToLower().StartsWith("query.") && args[1].ToLower().EndsWith(".apprunning"))
+            if (!bWaitResultData && args.Length >= 2 && args[1].ToLower().StartsWith("query.") && args[1].ToLower().EndsWith(".apprunning"))
                 bWaitResultData = true;
 
             // The cmd was "Query.xx". Let's dump the result string to console
