@@ -121,6 +121,8 @@ namespace DS4WindowsCmd
         static void Main(string[] args)
         {
             string strResult = String.Empty;
+            string strResultToLower;
+
             bool   bWaitResultData = false;
             bool   bDoSendMsg = true;
             IntPtr hWndDS4WindowsForm = IntPtr.Zero;
@@ -150,7 +152,7 @@ namespace DS4WindowsCmd
                 Console.WriteLine("   ProfileName=Name of the existing DS4Windows profile");
                 Console.WriteLine("   Example: -command LoadProfile.1.SnakeGame");
                 Console.WriteLine("");
-                Console.WriteLine("DS4WindowsCmd.exe -command Query.device#.PropertyName  (query the value of a property)");
+                Console.WriteLine("DS4WindowsCmd.exe -command Query.device#.PropertyName  (query the value of a property. Some of the options return both text output and numerical value as errorlevel environment variable)");
                 Console.WriteLine("   device#=1..8 as controller slot index");
                 Console.WriteLine("   PropertyName=ProfileName | OutContType | ActiveOutDevType | UseDInputOnly | DeviceVIDPID | DevicePath | MacAddress | DisplayName | ConnType | ExclusiveStatus | Battery | Charging | AppRunning | OutputSlotType | OutputSlotPermanentType | OutputSlotAttachedStatus | OutputSlotInputBound");
                 Console.WriteLine("   Example: -command Query.1.Battery");
@@ -247,6 +249,8 @@ namespace DS4WindowsCmd
                 Console.WriteLine(strResult);
             }
 
+            strResultToLower = strResult.ToLower();
+
             if (bDoSendMsg == false)
                 Environment.ExitCode = 1000; // Something went wrong with Query.xxx cmd. The cmd was not sent, so return error status 1000
             else if (args[1].ToLower().StartsWith("query.") && args[1].ToLower().EndsWith(".battery"))
@@ -256,7 +260,7 @@ namespace DS4WindowsCmd
                     iBatteryLevel = 1000;
                 Environment.ExitCode = iBatteryLevel;
             }
-            else if (strResult.ToLower() == "true")
+            else if (strResultToLower == "true" || strResultToLower == "attached" || strResultToLower == "bound" || strResultToLower == "permanent")
                 Environment.ExitCode = 1;
             else
                 Environment.ExitCode = 0;
